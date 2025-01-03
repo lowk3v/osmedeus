@@ -12,7 +12,7 @@ const (
 	// SNAPSHOT binary name of osmedeus
 	SNAPSHOT = "osm"
 	// AUTHOR of this
-	AUTHOR = "@j3ssiejjj"
+	AUTHOR = "@j3ssiejjj modified by @LowK3v"
 	// DOCS private document
 	DOCS = "https://docs.osmedeus.org"
 	// METADATA domain for checking update
