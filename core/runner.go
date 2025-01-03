@@ -245,8 +245,12 @@ func (r *Runner) PrepareParams() {
 				for _, param := range module.Params {
 					for k, v := range param {
 						// skip params if override: false
-						_, exist := r.Params[k]
+						existValue, exist := r.Params[k]
 						if r.ForceParams && exist {
+							if strings.HasPrefix(existValue, "~/") {
+								existValue = utils.NormalizePath(v)
+							}
+							r.Params[k] = ResolveData(existValue, r.Params)
 							utils.DebugF("Skip override param: %v --> %v", k, v)
 							continue
 						}
