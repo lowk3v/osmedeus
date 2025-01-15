@@ -102,7 +102,7 @@ func ScanUsage() string {
 	h += "  osmedeus scan -f extensive -t sample.com -t another.com\n"
 	h += "  cat list_of_urls.txt | osmedeus scan -f urls\n"
 	h += "  osmedeus scan --threads-hold=15 -f cidr -t 1.2.3.4/24\n"
-	h += "  osmedeus scan -m ~/.osmedeus/core/workflow/test/dirbscan.yaml -t list_of_urls.txt\n"
+	h += "  osmedeus scan -m ~/osmedeus/core/workflow/test/dirbscan.yaml -t list_of_urls.txt\n"
 	h += "  osmedeus scan --wfFolder ~/custom-workflow/ -f your-custom-workflow -t list_of_urls.txt\n"
 	h += "  osmedeus scan --chunk --chunk-part 40 -c 2 -f cidr -t list-of-cidr.txt\n"
 	return h

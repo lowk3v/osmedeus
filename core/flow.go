@@ -146,7 +146,7 @@ func DefaultWorkflows(options libs.Options) []string {
 	return results
 }
 
-// DirectSelectModule select module from ~/osmedeus-base/workflow/default-modules
+// DirectSelectModule select module from ~/osmedeus/base/workflow/default-modules
 func DirectSelectModule(options libs.Options, moduleName string) string {
 	// got absolutely path
 	if utils.FileExists(moduleName) {

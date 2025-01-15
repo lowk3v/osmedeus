@@ -116,8 +116,8 @@ func ListSingleWorkspace(options libs.Options, target string) (content [][]strin
 				runtimeContent = strings.ReplaceAll(runtimeContent, homeFolder, options.Env.WorkspacesFolder+"/")
 			}
 
-			if strings.Contains(runtimeContent, "/root/.osmedeus/workspaces") {
-				runtimeContent = strings.ReplaceAll(runtimeContent, "/root/.osmedeus/workspaces", options.Env.WorkspacesFolder)
+			if strings.Contains(runtimeContent, "/root/osmedeus/workspaces") {
+				runtimeContent = strings.ReplaceAll(runtimeContent, "/root/osmedeus/workspaces", options.Env.WorkspacesFolder)
 			}
 
 			row := []string{"==> Workspace Name", color.HiGreenString(ws.Name()), color.HiGreenString(wsFolder)}

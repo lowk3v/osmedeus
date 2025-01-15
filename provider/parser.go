@@ -1,8 +1,8 @@
 package provider
 
 import (
-	"os"
 	"math/rand"
+	"os"
 	"time"
 
 	"github.com/Shopify/yaml"
@@ -22,7 +22,7 @@ type Builder struct {
 	SecretKey string `yaml:"secret_key"`
 }
 
-// ConfigProvider cloud config file for each provider from ~/osmedeus-base/cloud/provider.yaml
+// ConfigProvider cloud config file for each provider from ~/osmedeus/base/cloud/provider.yaml
 type ConfigProvider struct {
 	// core part
 	Name  string `yaml:"name"`
@@ -60,7 +60,7 @@ type ConfigProvider struct {
 	RawCommand   string `yaml:"-"`
 }
 
-// ParseProvider parse cloud file from ~/osmedeus-base/cloud/provider.yaml
+// ParseProvider parse cloud file from ~/osmedeus/base/cloud/provider.yaml
 func ParseProvider(cloudFile string) (ConfigProviders, error) {
 	var clouds ConfigProviders
 	cloudFile = utils.NormalizePath(cloudFile)

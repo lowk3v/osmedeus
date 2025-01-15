@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path"
-	"path/filepath"
 	"runtime"
 	"strings"
 
@@ -20,35 +19,6 @@ var v *viper.Viper
 
 // InitConfig Init the config
 func InitConfig(options *libs.Options) error {
-	// ~/.osmedeus
-	RootFolder := filepath.Dir(utils.NormalizePath(options.ConfigFile))
-	if !utils.FolderExists(RootFolder) {
-		if err := os.MkdirAll(RootFolder, 0750); err != nil {
-			return err
-		}
-	}
-
-	// Base folder
-	// ~/osmedeus-base
-	BaseFolder := utils.NormalizePath(options.Env.BaseFolder)
-	if !utils.FolderExists(BaseFolder) {
-		fmt.Printf("%v Base folder not found at: %v\n", color.RedString("[Panic]"), color.HiGreenString(BaseFolder))
-		fmt.Printf(color.HiYellowString("[!]")+" Consider running the installation script first: %v\n", color.HiGreenString("bash <(curl -fsSL %v)", libs.INSTALL))
-		fmt.Printf(color.HiYellowString("[!]")+" Or better visit the installation guide at: %v\n", color.HiMagentaString("https://docs.osmedeus.org/installation/"))
-		os.Exit(-1)
-	}
-
-	// load all the tokens
-	options.TokenConfigFile = path.Join(BaseFolder, "token/osm-var.yaml")
-	if !utils.FolderExists(path.Dir(options.TokenConfigFile)) {
-		utils.MakeDir(path.Dir(options.TokenConfigFile))
-	}
-
-	options.Env.WorkspacesFolder = utils.NormalizePath(options.Env.WorkspacesFolder)
-	if !utils.FolderExists(options.Env.WorkspacesFolder) {
-		utils.MakeDir(options.Env.WorkspacesFolder)
-	}
-
 	// init config
 	options.ConfigFile = utils.NormalizePath(options.ConfigFile)
 	v = viper.New()
@@ -59,8 +29,20 @@ func InitConfig(options *libs.Options) error {
 
 	err := v.ReadInConfig()
 	if err != nil {
+		userHome, _ := os.UserHomeDir()
+		RootFolder := fmt.Sprintf("~/%s/", libs.BINARY)
+		BaseFolder := fmt.Sprintf("~/%s/base", libs.BINARY)
+		if options.ConfigFile == "" {
+			options.ConfigFile = fmt.Sprintf("%s/%s/config.yaml", userHome, libs.BINARY)
+		}
 		secret := utils.GenHash(utils.RandomString(8) + utils.GetTS())[:32] // only 32 char
 		prefix := secret[len(secret)-20 : len(secret)-1]
+
+		tokenFile := fmt.Sprintf("%s/%s/base/token/osm-var.yaml", userHome, libs.BINARY)
+		v.SetDefault("token_file", tokenFile)
+		if !utils.FolderExists(tokenFile) {
+			utils.MakeDir(path.Dir(tokenFile))
+		}
 
 		// set some default config if config file doesn't exist
 		v.SetDefault("Server", map[string]string{
@@ -109,17 +91,18 @@ func InitConfig(options *libs.Options) error {
 
 		v.SetDefault("Environments", map[string]string{
 			// RootFolder --> ~/.osmedeus/
+			"root":            fmt.Sprintf("~/%s/", libs.BINARY),
+			"base":            fmt.Sprintf("~/%s/base/", libs.BINARY),
 			"storages":        path.Join(RootFolder, "storages"),
 			"backups":         path.Join(RootFolder, "backups"),
 			"provider_config": path.Join(RootFolder, "provider"),
 			"instances":       path.Join(RootFolder, "instances"),
+			"workflows":       path.Join(RootFolder, "workflow"),
 
 			// store all the result
-			"workspaces": options.Env.WorkspacesFolder,
+			"workspaces": path.Join(RootFolder, "workspaces"),
 
 			// this update occasionally
-			// BaseFolder --> ~/osmedeus-base/
-			"workflows":    path.Join(BaseFolder, "workflow"),
 			"binaries":     path.Join(BaseFolder, "binaries"),
 			"data":         path.Join(BaseFolder, "data"),
 			"cloud_config": path.Join(BaseFolder, "cloud"),
@@ -129,6 +112,25 @@ func InitConfig(options *libs.Options) error {
 			utils.ErrorF("Error writing config file: %s", err)
 		}
 		utils.InforF("Created a new configuration file at %s", color.HiCyanString(options.ConfigFile))
+	}
+
+	RootFolder := v.GetStringMapString("environments")["root"]
+	if !utils.FolderExists(RootFolder) {
+		if err := os.MkdirAll(RootFolder, 0750); err != nil {
+			return err
+		}
+	}
+	BaseFolder := v.GetStringMapString("environments")["base"]
+	if !utils.FolderExists(BaseFolder) {
+		fmt.Printf("%v Base folder not found at: %v\n", color.RedString("[Panic]"), color.HiGreenString(BaseFolder))
+		fmt.Printf(color.HiYellowString("[!]")+" Consider running the installation script first: %v\n", color.HiGreenString("bash <(curl -fsSL %v)", libs.INSTALL))
+		fmt.Printf(color.HiYellowString("[!]")+" Or better visit the installation guide at: %v\n", color.HiMagentaString("https://docs.osmedeus.org/installation/"))
+		os.Exit(-1)
+	}
+
+	workspaces := v.GetStringMapString("environments")["workspaces"]
+	if !utils.FolderExists(workspaces) {
+		utils.MakeDir(workspaces)
 	}
 
 	if isWritable, _ := utils.IsWritable(options.ConfigFile); isWritable {
@@ -154,6 +156,8 @@ func LoadConfig(options *libs.Options) *viper.Viper {
 
 func ParsingConfig(options *libs.Options) {
 	v = LoadConfig(options)
+	options.TokenConfigFile = v.GetString("token_file")
+
 	GetEnv(options)
 	GetServer(options)
 	GetClient(options)
@@ -167,11 +171,19 @@ func ParsingConfig(options *libs.Options) {
 func GetEnv(options *libs.Options) {
 	envs := v.GetStringMapString("Environments")
 
+	if options.Env.RootFolder == "" {
+		options.Env.RootFolder = utils.NormalizePath(envs["root"])
+	}
+
+	if options.Env.BaseFolder == "" {
+		options.Env.BaseFolder = utils.NormalizePath(envs["base"])
+	}
+
 	options.Env.BinariesFolder = utils.NormalizePath(envs["binaries"])
 	utils.MakeDir(options.Env.BinariesFolder)
 
-	if options.Env.WorkFlowsFolder != "" {
-		options.Env.WorkFlowsFolder = utils.NormalizePath(options.Env.WorkFlowsFolder)
+	if options.Env.WorkFlowsFolder == "" {
+		options.Env.WorkFlowsFolder = utils.NormalizePath(envs["workflows"])
 	}
 
 	options.Env.DataFolder = utils.NormalizePath(envs["data"])
@@ -186,16 +198,15 @@ func GetEnv(options *libs.Options) {
 	// local data
 	options.Env.StoragesFolder = utils.NormalizePath(envs["storages"])
 	utils.MakeDir(options.Env.StoragesFolder)
-	options.Env.WorkspacesFolder = utils.NormalizePath(envs["workspaces"])
+
+	if options.Env.WorkspacesFolder == "" {
+		options.Env.WorkspacesFolder = utils.NormalizePath(envs["workspaces"])
+	}
 	utils.MakeDir(options.Env.WorkspacesFolder)
 
 	customWorkflow := utils.GetOSEnv("CUSTOM_OSM_WORKFLOW", "CUSTOM_OSM_WORKFLOW")
 	if customWorkflow != "CUSTOM_OSM_WORKFLOW" && options.Env.WorkFlowsFolder == "" {
 		options.Env.WorkFlowsFolder = utils.NormalizePath(customWorkflow)
-	}
-
-	if options.Env.WorkFlowsFolder == "" {
-		options.Env.WorkFlowsFolder = utils.NormalizePath(envs["workflows"])
 	}
 
 	// @NOTE: well of course you can rebuild the core engine binary to bypass this check
@@ -217,7 +228,7 @@ func GetEnv(options *libs.Options) {
 	utils.MakeDir(options.Env.ProviderFolder)
 	utils.MakeDir(options.Env.InstancesFolder)
 
-	// ~/osmedeus-base/clouds/
+	// ~/osmedeus/base/clouds/
 	options.Env.CloudConfigFolder = utils.NormalizePath(envs["cloud_config"])
 }
 
@@ -277,7 +288,7 @@ func GetCloud(options *libs.Options) {
 		return
 	}
 
-	// ~/osemedeus-base/cloud/provider.yaml
+	// ~/osemedeus/base/cloud/provider.yaml
 	cloudConfigFile := path.Join(options.Env.CloudConfigFolder, "provider.yaml")
 
 	options.CloudConfigFile = cloudConfigFile
@@ -360,6 +371,8 @@ func GetClient(options *libs.Options) map[string]string {
 	client := v.GetStringMapString("Client")
 	options.Client.Username = client["username"]
 	options.Client.Password = client["password"]
+	options.Client.URL = client["url"]
+	options.Client.JWT = client["jwt"]
 	return client
 }
 

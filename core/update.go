@@ -109,7 +109,7 @@ func CheckUpdate(options *libs.Options) bool {
 	if shouldUpdate {
 		home, _ := homedir.Dir()
 		fmt.Printf("📖 Run %s again to update Check out this page for more detail: %s\n", color.HiGreenString("the same install script"), color.HiGreenString("https://docs.osmedeus.org/installation/"))
-		fmt.Printf("💡 If you want a fresh install please run the command: %s\n", color.HiBlueString("rm -rf %s/osmedeus-base %s/.osmedeus", home, home))
+		fmt.Printf("💡 If you want a fresh install please run the command: %s\n", color.HiBlueString("rm -rf %s/osmedeus/base %s/osmedeus", home, home))
 	}
 
 	return shouldUpdate
@@ -270,7 +270,7 @@ func UpdateBase(opt libs.Options) {
 		utils.InforF("Updating External binaries")
 		binPath := path.Join(opt.Update.UpdateFolder, "binaries")
 		utils.Move(binPath, opt.Env.BinariesFolder)
-		opt.Update.UpdateFolder = path.Join(opt.Update.UpdateFolder, fmt.Sprintf("%s-base", libs.BINARY))
+		opt.Update.UpdateFolder = path.Join(opt.Update.UpdateFolder, fmt.Sprintf("%s/base", libs.BINARY))
 	}
 
 	// update Env

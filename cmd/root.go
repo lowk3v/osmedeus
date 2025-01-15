@@ -28,11 +28,11 @@ func Execute() {
 }
 
 func init() {
-	RootCmd.PersistentFlags().StringVar(&options.Env.RootFolder, "rootFolder", fmt.Sprintf("~/.%s/", libs.BINARY), "The main folder where all configurations are stored")
-	RootCmd.PersistentFlags().StringVar(&options.Env.BaseFolder, "baseFolder", fmt.Sprintf("~/%s-base/", libs.BINARY), "Base Folder which is store data, binaries and workflows")
-	RootCmd.PersistentFlags().StringVar(&options.Env.DataFolder, "dataFolder", fmt.Sprintf("~/%s-base/data", libs.BINARY), "Data folder which is store wordlists, payloads, etc")
-	RootCmd.PersistentFlags().StringVar(&options.Env.WorkFlowsFolder, "wfFolder", "", fmt.Sprintf("Custom Workflow folder (default will get from '$HOME/%s-base/workflow')", libs.BINARY))
-	RootCmd.PersistentFlags().StringVar(&options.ConfigFile, "configFile", fmt.Sprintf("~/.%s/config.yaml", libs.BINARY), "Main configurations file")
+	RootCmd.PersistentFlags().StringVar(&options.ConfigFile, "configFile", fmt.Sprintf("~/%s/config.yaml", libs.BINARY), "Main configurations file")
+	RootCmd.PersistentFlags().StringVar(&options.Env.RootFolder, "rootFolder", "", "The main folder where all configurations are stored. Default: ~/osmedeus")
+	RootCmd.PersistentFlags().StringVar(&options.Env.BaseFolder, "baseFolder", "", "Base Folder which is store data, binaries and workflows. Default: ~/osmedeus/base")
+	RootCmd.PersistentFlags().StringVar(&options.Env.DataFolder, "dataFolder", fmt.Sprintf("~/%s/base/data", libs.BINARY), "Data folder which is store wordlists, payloads, etc")
+	RootCmd.PersistentFlags().StringVar(&options.Env.WorkFlowsFolder, "wfFolder", "", fmt.Sprintf("Custom Workflow folder (default will get from '$HOME/%s/workflow')", libs.BINARY))
 
 	// Workspace folder
 	RootCmd.PersistentFlags().StringVarP(&options.Env.WorkspacesFolder, "wsFolder", "W", fmt.Sprintf("~/workspaces-%s", libs.BINARY), "The main data folder within the workspaces where all scan results are stored")

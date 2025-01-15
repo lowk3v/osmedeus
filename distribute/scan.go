@@ -201,7 +201,7 @@ func (c *CloudRunner) CopyTarget() error {
 
 func (c *CloudRunner) CopyWorkflow() error {
 	utils.DebugF("Sync workflow of %s to %s", c.Opt.Env.WorkFlowsFolder, c.DestInstance)
-	destWorkflow := fmt.Sprintf("%v/osmedeus-base/", c.BasePath)
+	destWorkflow := fmt.Sprintf("%v/osmedeus/", c.BasePath)
 	if c.Opt.Cloud.RemoteWorkflowFolder != "" {
 		destWorkflow = c.Opt.Cloud.RemoteWorkflowFolder
 	}

@@ -40,7 +40,7 @@ func (r *Runner) RunModulesWithTimeout(timeoutRaw string, module libs.Module, op
 // CheckResume check resume report
 func CheckResume(module libs.Module) bool {
 	for _, report := range module.Report.Final {
-		if !strings.Contains(report, ".osmedeus/storages") && !utils.FileExists(report) {
+		if !strings.Contains(report, "osmedeus/storages") && !utils.FileExists(report) {
 			return false
 		}
 	}
@@ -159,7 +159,7 @@ func (r *Runner) RunCommands(commands []string, std string) string {
 					if err := utils.RunOSCommandStream(command, std); err != nil {
 						utils.DebugF("error running command: %v -- %v", command, err)
 					}
-					return 
+					return
 				}
 				out, err = utils.RunOSCommand(command)
 			} else {

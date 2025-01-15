@@ -23,7 +23,7 @@ func (p *Provider) PrePareBuildData() {
 	data["secret_key"] = p.SecretKey
 	data["source_ami"] = p.ProviderConfig.DefaultImage
 
-	// c.Cloud.ProviderFolder --> ~/.osmedeus/provider/<osmp-name>-v4.x-randomstring
+	// c.Cloud.ProviderFolder --> ~/osmedeus/provider/<osmp-name>-v4.x-randomstring
 	p.ProviderConfig.ProviderFolder = path.Join(p.Opt.Env.ProviderFolder, fmt.Sprintf("%s-%s", p.SnapshotName, utils.RandomString(6)))
 	utils.MakeDir(p.ProviderConfig.ProviderFolder)
 	data["ProviderFolder"] = p.ProviderConfig.ProviderFolder
@@ -37,7 +37,7 @@ func (p *Provider) PrePareBuildData() {
 	providerString := utils.RenderText(content, data)
 	data["Builder"] = providerString
 
-	// ~/osmedeus-base
+	// ~/osmedeus/base
 	data["BaseFolder"] = utils.NormalizePath(strings.TrimLeft(p.Opt.Env.BaseFolder, "/"))
 	data["Plugins"] = p.Opt.Env.BinariesFolder
 	data["OBin"] = p.Opt.Env.BinariesFolder
@@ -45,7 +45,7 @@ func (p *Provider) PrePareBuildData() {
 	data["Cloud"] = p.Opt.Env.CloudConfigFolder
 	data["Workflow"] = p.Opt.Env.WorkFlowsFolder
 
-	// ~/.osmedeus/workspaces
+	// ~/osmedeus/workspaces
 	data["Workspaces"] = p.Opt.Env.WorkspacesFolder
 	data["Binary"] = libs.BINARY
 	data["VERSION"] = libs.VERSION
@@ -69,7 +69,7 @@ func (p *Provider) BuildImage() (err error) {
 	p.PrePareBuildData()
 	p.DeleteOldSnapshot()
 
-	// p.ProviderConfig.ProviderFolder --> ~/.osmedeus/provider/<osmp-name>
+	// p.ProviderConfig.ProviderFolder --> ~/osmedeus/provider/<osmp-name>
 
 	utils.DebugF("Cleaning old provider build: %s", p.ProviderConfig.ProviderFolder)
 	os.RemoveAll(p.ProviderConfig.ProviderFolder)

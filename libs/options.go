@@ -149,21 +149,21 @@ type Storage struct {
 
 // Environment some config path
 type Environment struct {
-	RootFolder       string // ~/.osmedeus
-	StoragesFolder   string // ~/.osmedeus/storages/
+	RootFolder       string // ~/osmedeus
+	StoragesFolder   string // ~/osmedeus/storages/
 	WorkspacesFolder string // ~/workspaces-osmedeus/
 
 	// Base one
-	BaseFolder      string // ~/osmedeus-base
-	BinariesFolder  string // ~/osmedeus-base/binaries
-	DataFolder      string // ~/osmedeus-base/data/
-	OseFolder       string // ~/osmedeus-base/ose/
-	WorkFlowsFolder string // ~/osmedeus-base/workflow/
+	BaseFolder      string // ~/osmedeus/base
+	BinariesFolder  string // ~/osmedeus/base/binaries
+	DataFolder      string // ~/osmedeus/base/data/
+	OseFolder       string // ~/osmedeus/base/ose/
+	WorkFlowsFolder string // ~/osmedeus/workflow/
 
 	// cloud stuff
-	CloudConfigFolder string // ~/osmedeus-base/clouds/
-	ProviderFolder    string // ~/.osmedeus/providers/
-	InstancesFolder   string // ~/.osmedeus/instances/
+	CloudConfigFolder string // ~/osmedeus/base/clouds/
+	ProviderFolder    string // ~/osmedeus/providers/
+	InstancesFolder   string // ~/osmedeus/instances/
 	BackupFolder      string
 
 	// Mics
